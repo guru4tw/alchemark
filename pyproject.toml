@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "alchemark"
+version = "0.1.0"
+description = "The Pythonic document-to-Markdown library — beautiful API, helpful errors, zero surprises."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+    { name = "guru4tw", email = "joe.idv@gmail.com" },
+]
+keywords = ["markdown", "converter", "docx", "pdf", "html", "pptx", "ocr", "document"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Markup :: Markdown",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# Everything is bundled by default — `pip install alchemark` gives you all
+# converters out of the box. Note: image OCR additionally requires the
+# Tesseract binary on PATH (brew/apt/choco install tesseract).
+dependencies = [
+    "python-docx>=1.1.0",
+    "markdownify>=0.11.6",
+    "beautifulsoup4>=4.12.0",
+    "rich>=13.7.0",
+    "typer>=0.12.0",
+    "pdfplumber>=0.10.0",
+    "pypdf>=4.0.0",
+    "python-pptx>=0.6.23",
+    "pytesseract>=0.3.10",
+    "Pillow>=10.0.0",
+]
+
+# Kept as no-op aliases for backward compatibility — older docs/scripts still
+# work. Each one resolves to "(empty)" because the underlying packages are
+# already in the required `dependencies` above.
+[project.optional-dependencies]
+pdf = []
+pptx = []
+ocr = []
+all = []
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
+]
+
+[project.scripts]
+alchemark = "alchemark.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/guru4tw/alchemark"
+Documentation = "https://github.com/guru4tw/alchemark#readme"
+Repository = "https://github.com/guru4tw/alchemark"
+Issues = "https://github.com/guru4tw/alchemark/issues"
+Changelog = "https://github.com/guru4tw/alchemark/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/alchemark"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer CLI relies on function-call defaults for Argument/Option — that's the documented pattern.
+"src/alchemark/cli.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["pytesseract", "pdfplumber", "pptx.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=alchemark --cov-report=term-missing"
