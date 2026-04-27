@@ -82,3 +82,6 @@ pytest-cache-files-*/
 *_images/
 *.patch
 .claude/
+
+# PyPI credentials — must NEVER be committed
+.pypirc
