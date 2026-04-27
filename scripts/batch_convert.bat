@@ -42,9 +42,10 @@ if not "%~1"=="" (
 
 REM ----------------------------------------------------------------
 REM  Pick a Python interpreter.
-REM    1. Active venv (VIRTUAL_ENV)
-REM    2. The "py" launcher (py -3)
-REM    3. python on PATH
+REM    1. Active venv         (VIRTUAL_ENV)
+REM    2. Active conda env    (CONDA_PREFIX)
+REM    3. python on PATH      (covers conda envs activated without setting CONDA_PREFIX, plus plain python installs)
+REM    4. The "py" launcher   (last resort; on Windows it often picks an unrelated VS / Store Python)
 REM ----------------------------------------------------------------
 set "PYEXE="
 set "PY_SOURCE="
@@ -54,16 +55,22 @@ if defined VIRTUAL_ENV (
         set "PY_SOURCE=active venv"
     )
 )
-if not defined PYEXE (
-    where py >nul 2>nul && (
-        set "PYEXE=py -3"
-        set "PY_SOURCE=py launcher"
+if not defined PYEXE if defined CONDA_PREFIX (
+    if exist "%CONDA_PREFIX%\python.exe" (
+        set "PYEXE=%CONDA_PREFIX%\python.exe"
+        set "PY_SOURCE=active conda env (%CONDA_DEFAULT_ENV%)"
     )
 )
 if not defined PYEXE (
     where python >nul 2>nul && (
         set "PYEXE=python"
         set "PY_SOURCE=python on PATH"
+    )
+)
+if not defined PYEXE (
+    where py >nul 2>nul && (
+        set "PYEXE=py -3"
+        set "PY_SOURCE=py launcher"
     )
 )
 if not defined PYEXE (
